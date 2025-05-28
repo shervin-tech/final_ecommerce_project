@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Shopping Cart - Gaming Equipment Store{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm">
+    <div class="card-header bg-white">
+        <h2 class="h5 mb-0">
+            <i class="fas fa-shopping-cart me-2"></i>Shopping Cart
+        </h2>
+    </div>
+    <div class="card-body">
+        {% if cart_items %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th class="text-end">Total</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in cart_items %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        {% if item.product.image %}
+                                            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" 
+                                                 class="me-3" style="width: 50px; height: 50px; object-fit: contain;">
+                                        {% endif %}
+                                        <div>
+                                            <h6 class="mb-0">{{ item.product.name }}</h6>
+                                            <small class="text-muted">{{ item.product.category.name }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>${{ item.product.price }}</td>
+                                <td style="width: 150px;">
+                                    <form method="post" action="{% url 'shopping_cart:update_quantity' item.id %}" 
+                                          class="d-flex align-items-center">
+                                        {% csrf_token %}
+                                        <input type="number" name="quantity" value="{{ item.quantity }}" 
+                                               min="1" class="form-control form-control-sm me-2" 
+                                               onchange="this.form.submit()">
+                                    </form>
+                                </td>
+                                <td class="text-end">${{ item.get_total_price }}</td>
+                                <td class="text-end">
+                                    <a href="{% url 'shopping_cart:remove_from_cart' item.id %}" 
+                                       class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                            <td class="text-end"><strong>${{ total }}</strong></td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div class="text-end mt-3">
+                <a href="{% url 'store:product_list' %}" class="btn btn-outline-primary me-2">
+                    <i class="fas fa-arrow-left me-2"></i>Continue Shopping
+                </a>
+                <a href="{% url 'shopping_cart:checkout' %}" class="btn btn-primary">
+                    <i class="fas fa-check me-2"></i>Proceed to Checkout
+                </a>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <div class="display-1 text-muted mb-4">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <h3 class="text-muted mb-3">Your Cart is Empty</h3>
+                <p class="text-muted mb-4">Looks like you haven't added any items to your cart yet.</p>
+                <a href="{% url 'store:product_list' %}" class="btn btn-primary">
+                    <i class="fas fa-shopping-cart me-2"></i>Start Shopping
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 
